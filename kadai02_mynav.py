@@ -17,8 +17,10 @@ def set_driver(driver_path, headless_flg):
         options.add_argument('--headless')
 
     # 起動オプションの設定
+    # options.add_argument(
+    #     '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36')
     options.add_argument(
-        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36')
+        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36')
     # options.add_argument('log-level=3')
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
@@ -118,6 +120,9 @@ def main():
   file_name = f'検索結果(キーワード={key_word_search})'+'.csv'
   df.to_csv(file_name, encoding="utf-8_sig", index=False)
 
+
+def get_nextpage():
+    
 # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":
     main()
