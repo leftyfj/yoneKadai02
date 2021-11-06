@@ -47,7 +47,7 @@ def main():
 
   key_word_search = input('検索したいキーワードを入力してください。>>')  
     #key_word_search ='松江市'
-  print(key_word_search)
+#   print(key_word_search)
 
   # Webサイトを開く
   driver.get(TARGET_SITE)
@@ -57,7 +57,6 @@ def main():
   driver.execute_script('document.querySelector(".karte-close").click()')
   time.sleep(4)
   # ポップアップを閉じる
-
   driver.execute_script('document.querySelector(".karte-close").click()')
 
   #キーワードを検索窓に入力する
@@ -120,8 +119,6 @@ def main():
   file_name = f'検索結果(キーワード={key_word_search})'+'.csv'
   df.to_csv(file_name, encoding="utf-8_sig", index=False)
 
-
-def get_nextpage():
     
 # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":
