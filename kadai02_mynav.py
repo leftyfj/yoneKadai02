@@ -6,8 +6,6 @@ import time
 import pandas as pd
 
 # Chromeを起動する関数
-
-
 def set_driver(driver_path, headless_flg):
     if "chrome" in driver_path:
           options = ChromeOptions()
@@ -42,12 +40,11 @@ def main():
   elif os.name == 'posix':  # Mac
       driver = set_driver("chromedriver", False)
 
-   #対象とするサイト
+    #対象とするサイト
   TARGET_SITE = 'https://tenshoku.mynavi.jp/'
 
-
   key_word_search = input('検索したいキーワードを入力してください。>>')  
-#   key_word_search ='松江市'
+    #key_word_search ='松江市'
   print(key_word_search)
 
   # Webサイトを開く
@@ -76,6 +73,7 @@ def main():
   page = 1
   counts_companies = 1
 
+  df = pd.DataFrame()
   while True:
     contents = driver.find_elements_by_css_selector('.cassetteRecruit')
     print(f'{page}ページ目の企業数={len(contents)}')
@@ -84,12 +82,26 @@ def main():
         name_catch = name_catch.strip().split('|')
         try:
             name = name_catch[0]
-            catch = name_catch[1]
+            company_catch = name_catch[1]
         except:
             name = name_catch
         title = content.find_element_by_css_selector(
             ".cassetteRecruit__copy > a").text
-        print(counts_companies, name, title)
+        link = content.find_element_by_css_selector(
+            ".cassetteRecruit__copy > a").get_attribute("href")
+        update_date = content.find_element_by_css_selector(
+            ".cassetteRecruit__updateDate > span").text
+        print(counts_companies, name,update_date,link)
+
+        df = df.append({
+            'No.': counts_companies,
+            '企業名': name,
+            '募集内容': title,
+            '情報更新日': update_date,
+            '募集内容詳細': link,
+            '企業紹介': company_catch
+        }, ignore_index=True)
+
         counts_companies += 1
 
     try:
@@ -100,9 +112,11 @@ def main():
         element_click.click()
     except:
         print("終わりました")
-   
+        driver.close()
         break   
 
+  file_name = f'検索結果(キーワード={key_word_search})'+'.csv'
+  df.to_csv(file_name, encoding="utf-8_sig", index=False)
 
 # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
 if __name__ == "__main__":

@@ -140,3 +140,6 @@ cython_debug/
 test.py
 mynavi_sample.py
 chromedriver.exe
+
+# 「.htaccess」と「.htpasswd」など、.ht で始まるファイルを追跡しない
+検索*
