@@ -46,8 +46,6 @@ def main():
   TARGET_SITE = 'https://tenshoku.mynavi.jp/'
 
   key_word_search = input('検索したいキーワードを入力してください。>>')  
-    #key_word_search ='松江市'
-#   print(key_word_search)
 
   # Webサイトを開く
   driver.get(TARGET_SITE)
