@@ -121,16 +121,19 @@ def main():
 
             counts_companies += 1
 
-        try:
+        element_click = driver.find_elements_by_css_selector(
+            ".iconFont--arrowLeft")
+
+        if len(element_click) >= 1:
             page += 1
-            element_click = driver.find_element_by_css_selector(
-                ".iconFont--arrowLeft")
-            driver.execute_script("arguments[0].scrollIntoView(true);", element_click)
-            element_click.click()
-        except:
+            driver.execute_script(
+                "arguments[0].scrollIntoView(true);", element_click[0])
+            element_click[0].click()
+        else:
             print("検索結果を全て取得しました。")
             driver.close()
-            break   
+            break
+    
 
     # 結果をcsvファイルに保存
     file_name = f'検索結果(キーワード={key_word_search})'+'.csv'

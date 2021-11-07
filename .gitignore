@@ -140,6 +140,7 @@ cython_debug/
 test.py
 mynavi_sample.py
 chromedriver.exe
+TODO.txt
 
 # 「.htaccess」と「.htpasswd」など、.ht で始まるファイルを追跡しない
 検索*
