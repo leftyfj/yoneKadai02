@@ -104,7 +104,10 @@ def main():
                 ".cassetteRecruit__copy > a").get_attribute("href")
             update_date = content.find_element_by_css_selector(
                 ".cassetteRecruit__updateDate > span").text
-            print(counts_companies, name,update_date,link)
+            
+            salary1st = content.find_element_by_xpath(
+                '//th[contains(text(),"初年度年収")]/following-sibling::td').text
+            print(counts_companies, name,salary1st)
 
             df = df.append({
                 'No.': counts_companies,
@@ -112,7 +115,8 @@ def main():
                 '募集内容': title,
                 '情報更新日': update_date,
                 '募集内容詳細': link,
-                '企業紹介': company_catch
+                '企業紹介': company_catch,
+                '初年度年収': salary1st
             }, ignore_index=True)
 
             counts_companies += 1
