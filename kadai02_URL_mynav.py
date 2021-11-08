@@ -86,12 +86,12 @@ def main():
   #検索キーワードをパラメータとしてURLを生成して検索する
     paramaters_search = make_paramaters(key_word_search)
     driver.get(TARGET_SITE + 'list/' + paramaters_search)
-    make_log('検索キーワードを付加しURLを生成')
+    make_log(f'検索キーワード({key_word_search})を付加しURLを生成')
   # 検索結果 件数を取得、表示
     total_names = driver.find_element_by_css_selector(
       "span.js__searchRecruit--count").text
     print(f'キーワードに該当する企業数={total_names}社')
-    make_log(f'検索結果取得:キーワードに該当する企業数={total_names}社')
+    make_log(f'検索結果取得成功:キーワードに該当する企業数={total_names}社')
     page = 1
     counts_companies = 1
 
@@ -101,36 +101,42 @@ def main():
         print(f'{page}ページ目の企業数={len(contents)}')
         make_log(f'{page}ページ目の企業数={len(contents)}')
         for content in contents:
-            name_catch =content.find_element_by_css_selector("h3").text
-            name_catch = name_catch.strip().split('|')
             try:
-                name = name_catch[0]
-                company_catch = name_catch[1]
-            except:
-                name = name_catch
-            title = content.find_element_by_css_selector(
+                name_catch =content.find_element_by_css_selector("h3").text
+                name_catch = name_catch.strip().split('|')
+                if(len(name_catch) > 1):
+                    name = name_catch[0]
+                    company_catch = name_catch[1]
+                else:
+                    name = name_catch[0]
+                    company_catch = ''
+                title = content.find_element_by_css_selector(
                 ".cassetteRecruit__copy > a").text
-            link = content.find_element_by_css_selector(
+                link = content.find_element_by_css_selector(
                 ".cassetteRecruit__copy > a").get_attribute("href")
-            update_date = content.find_element_by_css_selector(
+                update_date = content.find_element_by_css_selector(
                 ".cassetteRecruit__updateDate > span").text
             
-            salary1st = content.find_element_by_xpath(
+                salary1st = content.find_element_by_xpath(
                 '//th[contains(text(),"初年度年収")]/following-sibling::td').text
-            print(counts_companies, name,salary1st)
 
-            df = df.append({
-                'No.': counts_companies,
-                '企業名': name,
-                '募集内容': title,
-                '情報更新日': update_date,
-                '募集内容詳細': link,
-                '企業紹介': company_catch,
-                '初年度年収': salary1st
-            }, ignore_index=True)
+                df = df.append({
+                    'No.': counts_companies,
+                    '企業名': name,
+                    '募集内容': title,
+                    '情報更新日': update_date,
+                    '募集内容詳細': link,
+                    '企業紹介': company_catch,
+                    '初年度年収': salary1st
+                }, ignore_index=True)
+                make_log(f'{counts_companies}社目 情報取得成功')
+            except Exception as e:
+                make_log(f'{counts_companies}社目 情報取得失敗')
+                make_log(traceback.format_exc())
+            finally:
+                counts_companies += 1
 
-            counts_companies += 1
-
+        #次ページへ遷移
         element_click = driver.find_elements_by_css_selector(
             ".iconFont--arrowLeft")
 
@@ -139,6 +145,7 @@ def main():
             driver.execute_script(
                 "arguments[0].scrollIntoView(true);", element_click[0])
             element_click[0].click()
+            make_log(f'{page}目へ遷移')
         else:
             print("検索結果を全て取得しました。")
             driver.close()
@@ -146,8 +153,11 @@ def main():
     
 
     # 結果をcsvファイルに保存
-    file_name = f'検索結果(キーワード={key_word_search})'+'.csv'
-    df.to_csv(file_name, encoding="utf-8_sig", index=False)
+    today = datetime.datetime.now().strftime('%Y-%m-%d')
+    file_name_path = './results/' + \
+        f'検索結果(キーワード={key_word_search})_{today}'+'.csv'
+    df.to_csv(file_name_path, encoding="utf-8_sig", index=False)
+    make_log(f'ファイルに保存_ファイル名「検索結果(キーワード={key_word_search}).csv」')
 
     
 # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)

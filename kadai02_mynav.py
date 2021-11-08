@@ -80,7 +80,7 @@ def main():
     total_names = driver.find_element_by_css_selector(
       "span.js__searchRecruit--count").text
     print(f'キーワードに該当する企業数={total_names}社')
-    make_log(f'検索結果取得:キーワードに該当する企業数={total_names}社')
+    make_log(f'検索結果取得成功:キーワードに該当する企業数={total_names}社')
     page = 1
     counts_companies = 1
 
@@ -135,11 +135,11 @@ def main():
             driver.execute_script(
                 "arguments[0].scrollIntoView(true);", element_click[0])
             element_click[0].click()
+            make_log(f'{page}目へ遷移')
         else:
             print("検索結果を全て取得しました。")
             driver.close()
             break
-    LOG_FILE_PATH = "./log/log_{datetime}.log"
 
     # 結果をcsvファイルに保存
     today = datetime.datetime.now().strftime('%Y-%m-%d')
