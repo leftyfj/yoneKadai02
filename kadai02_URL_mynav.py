@@ -1,22 +1,21 @@
-# input から入力されたキーワードを変数に入れる
-# 半角スペースでsplitしリストへ入れる
-# リストから要素を取り出し、　kw要素1_kwa要素2の形式で文字列を生成する
-# この文字列をURLに連結する
-# ブラウザを更新する driver.get(TARGET_SITE)
-
 import os
 from selenium import webdriver
-
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
 import time
+import datetime
 import pandas as pd
+import traceback
 
 # 使用するブラウザ
 BROWSER = "Firefox"
 #対象とするサイト
 TARGET_SITE = 'https://tenshoku.mynavi.jp/'
+
+LOG_FILE_PATH = "./log/log_{datetime}.log"
+log_file_path = LOG_FILE_PATH.format(
+    datetime=datetime.datetime.now().strftime('%Y-%m-%d'))
 
 # Chromeを起動する関数
 def set_driver(browser, headless_flg):
@@ -44,7 +43,16 @@ def set_driver(browser, headless_flg):
 
     return driver
 
+#log出力関数
+def make_log(txt):
+    now = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    logStr = '[%s:%s] %s' % ('log', now, txt)
+    #ファイルに出力
+    with open(log_file_path, 'a', encoding='utf-8_sig') as f:
+        f.write(logStr + '\n')
+    print(logStr)
 
+#URLに付加する検索キーワードを生成する関数
 def make_paramaters(words):
     word_list = words.split()
     num = len(word_list)
@@ -62,10 +70,9 @@ def make_paramaters(words):
 def main():
    # driverを起動
     driver = set_driver(BROWSER,False)
-   
+    make_log('ブラウザ起動')
     key_word_search = input('検索したいキーワードを入力してください。>>')  
 
-    paramaters_search = make_paramaters(key_word_search)
   # Webサイトを開く
     driver.get(TARGET_SITE)
     time.sleep(4)
@@ -77,12 +84,14 @@ def main():
     driver.execute_script('document.querySelector(".karte-close").click()')
 
   #検索キーワードをパラメータとしてURLを生成して検索する
+    paramaters_search = make_paramaters(key_word_search)
     driver.get(TARGET_SITE + 'list/' + paramaters_search)
+    make_log('検索キーワードを付加しURLを生成')
   # 検索結果 件数を取得、表示
     total_names = driver.find_element_by_css_selector(
       "span.js__searchRecruit--count").text
     print(f'キーワードに該当する企業数={total_names}社')
-
+    make_log(f'検索結果取得:キーワードに該当する企業数={total_names}社')
     page = 1
     counts_companies = 1
 
@@ -90,6 +99,7 @@ def main():
     while True:
         contents = driver.find_elements_by_css_selector('.cassetteRecruit')
         print(f'{page}ページ目の企業数={len(contents)}')
+        make_log(f'{page}ページ目の企業数={len(contents)}')
         for content in contents:
             name_catch =content.find_element_by_css_selector("h3").text
             name_catch = name_catch.strip().split('|')
