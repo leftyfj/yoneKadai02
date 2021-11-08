@@ -137,6 +137,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# My Setting
+log/
+results/
 test.py
 mynavi_sample.py
 chromedriver.exe
