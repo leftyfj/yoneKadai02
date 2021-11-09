@@ -135,7 +135,7 @@ def main():
             driver.execute_script(
                 "arguments[0].scrollIntoView(true);", element_click[0])
             element_click[0].click()
-            make_log(f'{page}目へ遷移')
+            make_log(f'{page}ページ目へ遷移')
         else:
             print("検索結果を全て取得しました。")
             driver.close()

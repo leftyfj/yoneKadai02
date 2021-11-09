@@ -66,6 +66,18 @@ def make_paramaters(words):
       count += 1
     return words_search
 
+
+def find_table_target_word(table_ele, word):
+    th_list = table_ele.find_elements_by_css_selector("th")
+    td_list = table_ele.find_elements_by_css_selector("td")
+    target = ''
+    for th, td in zip(th_list, td_list):
+        if word == th.text:
+            target=td.text
+            break
+        
+    return target
+
 # main処理
 def main():
    # driverを起動
@@ -90,7 +102,7 @@ def main():
   # 検索結果 件数を取得、表示
     total_names = driver.find_element_by_css_selector(
       "span.js__searchRecruit--count").text
-    print(f'キーワードに該当する企業数={total_names}社')
+    # print(f'キーワードに該当する企業数={total_names}社')
     make_log(f'検索結果取得成功:キーワードに該当する企業数={total_names}社')
     page = 1
     counts_companies = 1
@@ -98,12 +110,13 @@ def main():
     df = pd.DataFrame()
     while True:
         contents = driver.find_elements_by_css_selector('.cassetteRecruit')
-        print(f'{page}ページ目の企業数={len(contents)}')
+        # print(f'{page}ページ目の企業数={len(contents)}')
         make_log(f'{page}ページ目の企業数={len(contents)}')
         for content in contents:
             try:
                 name_catch =content.find_element_by_css_selector("h3").text
                 name_catch = name_catch.strip().split('|')
+                
                 if(len(name_catch) > 1):
                     name = name_catch[0]
                     company_catch = name_catch[1]
@@ -116,9 +129,8 @@ def main():
                 ".cassetteRecruit__copy > a").get_attribute("href")
                 update_date = content.find_element_by_css_selector(
                 ".cassetteRecruit__updateDate > span").text
-            
-                salary1st = content.find_element_by_xpath(
-                '//th[contains(text(),"初年度年収")]/following-sibling::td').text
+                table = content.find_element_by_css_selector(".tableCondition")
+                salary1styear = find_table_target_word(table,"初年度年収")
 
                 df = df.append({
                     'No.': counts_companies,
@@ -127,7 +139,7 @@ def main():
                     '情報更新日': update_date,
                     '募集内容詳細': link,
                     '企業紹介': company_catch,
-                    '初年度年収': salary1st
+                    '初年度年収': salary1styear
                 }, ignore_index=True)
                 make_log(f'{counts_companies}社目 情報取得成功')
             except Exception as e:
@@ -145,7 +157,7 @@ def main():
             driver.execute_script(
                 "arguments[0].scrollIntoView(true);", element_click[0])
             element_click[0].click()
-            make_log(f'{page}目へ遷移')
+            make_log(f'{page}ページ目へ遷移')
         else:
             print("検索結果を全て取得しました。")
             driver.close()
